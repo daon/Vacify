@@ -33,17 +33,20 @@ namespace VacifyWeb.Controllers
                     clientContext.Load(personProperties, p => p.UserProfileProperties);
                     clientContext.ExecuteQuery();
 
-                    string managerAccountName = null;
-                    personProperties.UserProfileProperties.TryGetValue("Manager", out managerAccountName);
-                    PersonProperties managerProperties = peopleManager.GetPropertiesFor(managerAccountName);
-                    clientContext.Load(managerProperties, p => p.DisplayName);
-                    clientContext.ExecuteQuery();
+                    PersonProperties managerProperties = null;
+                    string managerAccountName = personProperties.UserProfileProperties["Manager"];
+                    if (!string.IsNullOrEmpty(managerAccountName))
+                    {
+                        managerProperties = peopleManager.GetPropertiesFor(managerAccountName);
+                        clientContext.Load(managerProperties, p => p.DisplayName);
+                        clientContext.ExecuteQuery();
+                    }
 
                     viewModel = new VacationRequestViewModel()
                     {
                         Name = personProperties.DisplayName,
                         PictureUrl = String.Format("{0}_layouts/15/userphoto.aspx?size={1}&accountname={2}", spContext.SPHostUrl, "L", personProperties.Email),
-                        Manager = managerProperties.DisplayName
+                        Manager = managerProperties != null ? managerProperties.DisplayName : "Lika A Boss!"
                     };
                 }
             }
