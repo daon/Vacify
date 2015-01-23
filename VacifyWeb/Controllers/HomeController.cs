@@ -94,6 +94,7 @@ namespace VacifyWeb.Controllers
                     vacationRequests = vacationRequestItems
                         .Select(vacationRequest => new VacationRequest()
                         {
+                            ID = ((int)vacationRequest["ID"]),
                             RequestBy = spUser.Title,
                             StartDate = ((DateTime)vacationRequest["EventDate"]),
                             EndDate = (DateTime)vacationRequest["EndDate"],
@@ -107,40 +108,29 @@ namespace VacifyWeb.Controllers
         [HttpPost]
         public JsonResult RequestVacation(List<VacationRequest> vacationRequests)
         {
-            var spContext = SharePointContextProvider.Current.GetSharePointContext(HttpContext);
-            using (var clientContext = spContext.CreateUserClientContextForSPAppWeb())
+            if (vacationRequests != null)
             {
-                if (clientContext != null)
+                var spContext = SharePointContextProvider.Current.GetSharePointContext(HttpContext);
+                using (var clientContext = spContext.CreateUserClientContextForSPAppWeb())
                 {
-                    List vacationRequestList = clientContext.Web.Lists.GetByTitle("Vacation Requests");
-   
-                    foreach(VacationRequest vacationRequest in vacationRequests)
+                    if (clientContext != null)
                     {
-                        ListItem listItem = vacationRequestList.AddItem(new ListItemCreationInformation());
-                        listItem["Title"] = "Vacation Request";
-                        listItem["EventDate"] = vacationRequest.StartDate;
-                        listItem["EndDate"] = vacationRequest.EndDate;
-                        listItem.Update();
-                    }
+                        List vacationRequestList = clientContext.Web.Lists.GetByTitle("Vacation Requests");
 
-                    clientContext.ExecuteQuery();
+                        foreach (VacationRequest vacationRequest in vacationRequests)
+                        {
+                            ListItem listItem = vacationRequestList.AddItem(new ListItemCreationInformation());
+                            listItem["Title"] = "Vacation Request";
+                            listItem["EventDate"] = vacationRequest.StartDate;
+                            listItem["EndDate"] = vacationRequest.EndDate;
+                            listItem.Update();
+                        }
+
+                        clientContext.ExecuteQuery();
+                    }
                 }
             }
             return new JsonResult();
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
         }
     }
 }

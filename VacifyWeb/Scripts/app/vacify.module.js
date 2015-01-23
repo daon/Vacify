@@ -1,8 +1,10 @@
 ﻿(function (angular) {
     'use strict';
 
-    angular.module('vacify', [
-        'ui.calendar'
-    ]);
+    angular
+        .module('vacify', [
+            'ngAnimate',
+            'ui.calendar'
+        ]);
 
 })(window.angular);

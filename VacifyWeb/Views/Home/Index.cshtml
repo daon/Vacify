@@ -4,8 +4,12 @@
     ViewBag.Title = "Vacify";
 }
 
-<h1 class="page-header">Request Vacation</h1>
+<div class="page-header">
+    <h1><span class="glyphicon glyphicon-calendar"></span> Vacify <small>Request Vacation</small></h1>
+</div>
 <div class="row" ng-controller="Calendar as calendar">
+    <div class="alert alert-success" role="alert" ng-show="calendar.successVisible" ng-animate="{show: 'fade-show', hide: 'fade-hide'}">{{ calendar.successMessage }}</div>
+    <div class="alert alert-danger" role="alert" ng-show="calendar.errorVisible">{{ calendar.errorMessage }}</div>
     <div class="col-md-3 col-sm-6 col-xs-12">
         <div class="thumbnail">
             <img src="@Model.PictureUrl" alt="@Model.Name" class="img-responsive" />

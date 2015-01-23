@@ -2,34 +2,24 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div ng-controller="Navigation as navigation" class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
-                @Html.ActionLink("Back to site", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                <a href="{{ navigation.spHostUrl }}" class="navbar-brand">Back to site</a>
             </div>
         </div>
     </div>
     <div class="container body-content">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/moment")
-    @Scripts.Render("~/bundles/angular")
-    @Scripts.Render("~/bundles/uicalendar")
-    @Scripts.Render("~/bundles/fullcalendar")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/spcontext")
+    @Scripts.Render("~/bundles/libs")
     @Scripts.Render("~/bundles/app")
     @RenderSection("scripts", required: false)
 </body>
