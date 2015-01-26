@@ -3,13 +3,12 @@
     <!-- Do not change the value of the Name attribute below. If it does not match the folder name of the List project item, an error will occur when the project is run. -->
     <ListTemplate
         Name="VacationRequests"
-        Type="106"
+        Type="100"
         BaseType="0"
         OnQuickLaunch="TRUE"
-        FolderCreation="FALSE"
         SecurityBits="11"
-        Sequence="340"
+        Sequence="410"
         DisplayName="Vacation Requests"
         Description="My List Definition"
-        Image="/_layouts/15/images/itevent.png"/>
+        Image="/_layouts/15/images/itgen.png"/>
 </Elements>

@@ -4,7 +4,9 @@
     angular
         .module('vacify', [
             'ngAnimate',
-            'ui.calendar'
+            'ui.calendar',
+            'ui.bootstrap',
+            'template/vacify.add-modal.html'
         ]);
 
 })(window.angular);

@@ -22,30 +22,22 @@ namespace VacifyWeb.Controllers
             VacationRequestViewModel viewModel = null;
             var spContext = SharePointContextProvider.Current.GetSharePointContext(HttpContext);
             ViewBag.SPHostUrl = spContext.SPHostUrl;
+
             using (var clientContext = spContext.CreateUserClientContextForSPHost())
             {
                 if (clientContext != null)
                 {
-                    PeopleManager peopleManager = new PeopleManager(clientContext);
-                    PersonProperties personProperties = peopleManager.GetMyProperties();
-                    clientContext.Load(personProperties, p => p.DisplayName);
-                    clientContext.Load(personProperties, p => p.Email);
-                    clientContext.Load(personProperties, p => p.UserProfileProperties);
+                    PersonProperties userProperties = LoadUserProperties(clientContext);
                     clientContext.ExecuteQuery();
 
-                    PersonProperties managerProperties = null;
-                    string managerAccountName = personProperties.UserProfileProperties["Manager"];
-                    if (!string.IsNullOrEmpty(managerAccountName))
-                    {
-                        managerProperties = peopleManager.GetPropertiesFor(managerAccountName);
-                        clientContext.Load(managerProperties, p => p.DisplayName);
-                        clientContext.ExecuteQuery();
-                    }
+                    PersonProperties managerProperties = LoadManagerProperties(clientContext, userProperties);
+                    if (managerProperties != null) clientContext.ExecuteQuery();
 
                     viewModel = new VacationRequestViewModel()
                     {
-                        Name = personProperties.DisplayName,
-                        PictureUrl = String.Format("{0}_layouts/15/userphoto.aspx?size={1}&accountname={2}", spContext.SPHostUrl, "L", personProperties.Email),
+                        Name = userProperties.DisplayName,
+                        PictureUrl = String.Format("{0}_layouts/15/userphoto.aspx?size={1}&accountname={2}", 
+                                        spContext.SPHostUrl, "L", userProperties.Email),
                         Manager = managerProperties != null ? managerProperties.DisplayName : "Lika A Boss!"
                     };
                 }
@@ -73,15 +65,24 @@ namespace VacifyWeb.Controllers
                         "<View>" +
                             "<Query>" +
                                 "<Where>" +
-                                    "<Eq>" +
-                                        "<FieldRef Name=\"Author\" />" +
-                                        "<Value Type=\"Text\">{0}</Value>" +
-                                    "</Eq>" +
+                                    "<Or>" +
+                                        "<Eq>" +
+                                            "<FieldRef Name=\"RequestBy\" />" +
+                                            "<Value Type=\"Text\">{0}</Value>" +
+                                        "</Eq>" +
+                                        "<Eq>" +
+                                            "<FieldRef Name=\"Approver\" />" +
+                                            "<Value Type=\"Text\">{0}</Value>" +
+                                        "</Eq>" +
+                                    "</Or>" +
                                 "</Where>" +
                             "</Query>" +
                             "<ViewFields>" +
-                                "<FieldRef Name=\"EventDate\" />" +
-                                "<FieldRef Name=\"EndDate\" />" +
+                                "<FieldRef Name=\"StartDate\" />" +
+                                "<FieldRef Name=\"_EndDate\" />" +
+                                "<FieldRef Name=\"RequestBy\" />" +
+                                "<FieldRef Name=\"Approver\" />" +
+                                "<FieldRef Name=\"Status\" />" +
                             "</ViewFields>" +
                             "<RowLimit>100</RowLimit>" +
                         "</View>",
@@ -95,10 +96,12 @@ namespace VacifyWeb.Controllers
                         .Select(vacationRequest => new VacationRequest()
                         {
                             ID = ((int)vacationRequest["ID"]),
-                            RequestBy = spUser.Title,
-                            StartDate = ((DateTime)vacationRequest["EventDate"]),
-                            EndDate = (DateTime)vacationRequest["EndDate"],
-                            Status = ""
+                            Title = vacationRequest["Title"].ToString(),
+                            StartDate = ((DateTime)vacationRequest["StartDate"]),
+                            EndDate = (DateTime)vacationRequest["_EndDate"],
+                            RequestBy = vacationRequest["RequestBy"].ToString(),
+                            Approver = vacationRequest["Approver"].ToString(),
+                            Status = vacationRequest["Status"].ToString()
                         }).ToList();
                 }
             }
@@ -115,14 +118,23 @@ namespace VacifyWeb.Controllers
                 {
                     if (clientContext != null)
                     {
+                        PersonProperties userProperties = LoadUserProperties(clientContext);
+                        clientContext.ExecuteQuery();
+
+                        PersonProperties managerProperties = LoadManagerProperties(clientContext, userProperties);
+                        if (managerProperties != null) clientContext.ExecuteQuery();
+
                         List vacationRequestList = clientContext.Web.Lists.GetByTitle("Vacation Requests");
 
                         foreach (VacationRequest vacationRequest in vacationRequests)
                         {
                             ListItem listItem = vacationRequestList.AddItem(new ListItemCreationInformation());
-                            listItem["Title"] = "Vacation Request";
-                            listItem["EventDate"] = vacationRequest.StartDate;
-                            listItem["EndDate"] = vacationRequest.EndDate;
+                            listItem["Title"] = "New Vacation Request";
+                            listItem["StartDate"] = vacationRequest.StartDate;
+                            listItem["_EndDate"] = vacationRequest.EndDate;
+                            listItem["RequestBy"] = userProperties.DisplayName;
+                            listItem["Approver"] = managerProperties != null ? managerProperties.DisplayName : "Lika A Boss!";
+                            listItem["Status"] = vacationRequest.Status;
                             listItem.Update();
                         }
 
@@ -131,6 +143,31 @@ namespace VacifyWeb.Controllers
                 }
             }
             return new JsonResult();
+        }
+
+        private PersonProperties LoadUserProperties(ClientContext clientContext)
+        {
+            PeopleManager peopleManager = new PeopleManager(clientContext);
+            PersonProperties personProperties = peopleManager.GetMyProperties();
+            clientContext.Load(personProperties, p => p.DisplayName);
+            clientContext.Load(personProperties, p => p.Email);
+            clientContext.Load(personProperties, p => p.UserProfileProperties);
+
+            return personProperties;
+        }
+
+        private PersonProperties LoadManagerProperties(ClientContext clientContext, PersonProperties userProperties)
+        {
+            PeopleManager peopleManager = new PeopleManager(clientContext);
+            PersonProperties managerProperties = null;
+            string managerAccountName = userProperties.UserProfileProperties["Manager"];
+            if (!string.IsNullOrEmpty(managerAccountName))
+            {
+                managerProperties = peopleManager.GetPropertiesFor(managerAccountName);
+                clientContext.Load(managerProperties, p => p.DisplayName);
+            }
+
+            return managerProperties;
         }
     }
 }

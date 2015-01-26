@@ -46,8 +46,8 @@
     <Content Include="AppIcon.png">
       <OpcRelationship>manifest-icon</OpcRelationship>
     </Content>
-    <Content Include="Features\Feature1\Feature1.Template.xml">
-      <DependentUpon>Feature1.feature</DependentUpon>
+    <Content Include="Features\Vacify\Vacify.Template.xml">
+      <DependentUpon>Vacify.feature</DependentUpon>
     </Content>
     <Content Include="Package\Package.Template.xml">
       <DependentUpon>Package.package</DependentUpon>
@@ -74,17 +74,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Features\Feature1\Feature1.feature">
-      <FeatureId>{71b67b0e-8ab5-48b9-840b-3ef87a95bca2}</FeatureId>
+    <None Include="Features\Vacify\Vacify.feature">
+      <FeatureId>{90127d62-cf5c-4553-adfb-fafd571ac41c}</FeatureId>
     </None>
     <None Include="Package\Package.package">
       <PackageId>{7cc5542d-4262-4a04-8b34-f5a1b241c8b0}</PackageId>
     </None>
     <None Include="VacationRequests\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{a3a1fd40-fe07-4fae-b86a-42af21c23431}</SharePointProjectItemId>
+      <SharePointProjectItemId>{399ed1f1-3a2f-451d-bf77-79c693032186}</SharePointProjectItemId>
     </None>
     <None Include="VacationRequests\VacationRequestsInstance\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{fd790dd2-01e8-4677-8f21-6f92cb4afc27}</SharePointProjectItemId>
+      <SharePointProjectItemId>{18cf4784-d4b0-40fe-ba07-ac5505ccdd10}</SharePointProjectItemId>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

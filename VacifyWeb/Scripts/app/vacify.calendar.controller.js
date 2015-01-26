@@ -5,15 +5,16 @@
         .module('vacify')
         .controller('Calendar', Calendar);
 
-    Calendar.$inject = ['uiCalendarConfig', 'dataService', '$timeout'];
+    Calendar.$inject = ['uiCalendarConfig', 'dataService', '$timeout', '$modal'];
 
-    function Calendar(uiCalendarConfig, dataService, $timeout) {
+    function Calendar(uiCalendarConfig, dataService, $timeout, $modal) {
         var vm = this;
-        vm.events = [];
-        vm.savedEvents = [];
-        vm.removedEvents = [];
-        vm.eventSources = [vm.events, vm.savedEvents];
-        vm.requestVacation = requestVacation;
+        vm.requests = [];
+        vm.removedRequests = [];
+        vm.eventSources = [vm.requests];
+        vm.saveChanges = saveChanges;
+        vm.openAddModal = openAddModal;
+        vm.render = render;
 
         init();
 
@@ -29,6 +30,18 @@
             getVacationRequests();
         }
 
+        function openAddModal() {
+            var modalInstance = $modal.open({
+                templateUrl: 'vacify.addModal.html',
+                controller: 'AddModalInstance as vm',
+                size: 'sm'
+            });
+
+            modalInstance.result.then(function (request) {
+                vm.requests.push(request);
+            });
+        }
+
         function getVacationRequests() {
             dataService.getVacationRequests()
                 .then(requestComplete, requestFailed);
@@ -36,15 +49,15 @@
             function requestComplete(response) {
                 if (response.data) {
                     for (var i = 0; i < response.data.length; i++) {
-                        vm.savedEvents.push({
+                        vm.requests.push({
                             id: response.data[i].ID,
-                            title: "Pending Request",
+                            title: response.data[i].Title,
                             start: response.data[i].StartDate,
                             end: response.data[i].EndDate,
+                            status: response.data[i].Status,
                             allDay: true,
-                            status: "Pending",
                             color: statusToColor("Pending"),
-                            isSavedEvent: true
+                            isSavedRequest: true
                         })
                     }
                 }
@@ -57,15 +70,17 @@
             }
         }
 
-        function requestVacation() {
+        function saveChanges() {
             var vacationRequests = [];
-            for (var i = 0; i < vm.events.length; i++) {
-                vacationRequests.push({
-                    RequestBy: "Test",
-                    StartDate: vm.events[i].start,
-                    EndDate: vm.events[i].end,
-                    Status: "Pending"
-                });
+            for (var i = 0; i < vm.requests.length; i++) {
+                if (!vm.requests[i].isSavedRequest) {
+                    vacationRequests.push({
+                        RequestBy: "Test",
+                        StartDate: vm.requests[i].start,
+                        EndDate: vm.requests[i].end,
+                        Status: "Pending"
+                    });
+                }
             }
 
             dataService.requestVacation(vacationRequests)
@@ -83,40 +98,41 @@
         }
 
         function select(start, end) {
-            var eventData = {
+            var request = {
                 title: "New Request",
                 start: start,
                 end: end,
+                status: "New",
                 allDay: true
             };
 
-            vm.events.push(eventData);
+            vm.requests.push(request);
 
             if (uiCalendarConfig.calendars['vacationRequest']) {
                 uiCalendarConfig.calendars['vacationRequest'].fullCalendar('unselect');
             }
         }
 
-        function onMouseOverEvent(event, jsEvent, view) {
-            event.color = statusToHoverColor(event.status);
+        function onMouseOverEvent(request, jsEvent, view) {
+            request.color = statusToHoverColor(request.status);
             if (uiCalendarConfig.calendars['vacationRequest']) {
-                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('updateEvent', event);
+                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('updateEvent', request);
             }
         }
 
-        function onMouseOutEvent(event, jsEvent, view) {
-            event.color = statusToColor(event.status);
+        function onMouseOutEvent(request, jsEvent, view) {
+            request.color = statusToColor(request.status);
             if (uiCalendarConfig.calendars['vacationRequest']) {
-                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('updateEvent', event);
+                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('updateEvent', request);
             }
         }
 
-        function onClickEvent(event, jsEvent, view) {
-            if (event.isSavedEvent) {
-                vm.removedEvents.push(event);
+        function onClickEvent(request, jsEvent, view) {
+            if (request.isSavedRequest) {
+                vm.removedRequest.push(request);
             }
             if (uiCalendarConfig.calendars['vacationRequest']) {
-                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('removeEvents', event._id);
+                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('removeEvents', request._id);
             }
         }
 
@@ -136,6 +152,15 @@
                 vm[type + "Visible"] = false;
             }, 3000);
         }
+
+        function render() {
+            if (uiCalendarConfig.calendars['vacationRequest']) {
+                $timeout(function () {
+                    uiCalendarConfig.calendars['vacationRequest'].fullCalendar('render');
+                }, 15);
+            }
+            return;
+        }
         
         function statusToColor(status) {
             switch (status) {
@@ -154,6 +179,8 @@
                     return "#296579";
             }
         }
+
+        
     }
 
 })(window.angular);

@@ -13,6 +13,8 @@ namespace VacifyWeb
                     "~/Scripts/angular.js",
                     "~/Scripts/angular-sanitize.js",
                     "~/Scripts/angular-animate.js",
+                    "~/Scripts/angular-ui/ui-bootstrap.js",
+                    "~/Scripts/angular-ui/ui-bootstrap-tpls.js",
                     "~/Scripts/moment.js",
                     "~/Scripts/fullcalendar.js",
                     "~/Scripts/calendar.js",
@@ -23,7 +25,9 @@ namespace VacifyWeb
                         "~/Scripts/app/vacify.module.js",
                         "~/Scripts/app/vacify.data.service.js",
                         "~/Scripts/app/vacify.calendar.controller.js",
-                        "~/Scripts/app/vacify.navigation.controller.js"));
+                        "~/Scripts/app/vacify.navigation.controller.js",
+                        "~/Scripts/app/vacify.moment.filter.js",
+                        "~/Scripts/app/vacify.add.modal.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
