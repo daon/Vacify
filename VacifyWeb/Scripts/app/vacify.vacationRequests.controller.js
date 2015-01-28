@@ -1,20 +1,22 @@
-﻿(function (angular) {
+﻿(function (angular, moment) {
     'use strict';
 
     angular
         .module('vacify')
-        .controller('Calendar', Calendar);
+        .controller('VacationRequests', VacationRequests);
 
-    Calendar.$inject = ['uiCalendarConfig', 'dataService', '$timeout', '$modal'];
+    VacationRequests.$inject = ['uiCalendarConfig', 'vacationRequest', '$timeout', '$modal'];
 
-    function Calendar(uiCalendarConfig, dataService, $timeout, $modal) {
+    function VacationRequests(uiCalendarConfig, vacationRequest, $timeout, $modal) {
         var vm = this;
         vm.requests = [];
         vm.removedRequests = [];
         vm.eventSources = [vm.requests];
         vm.saveChanges = saveChanges;
         vm.openAddModal = openAddModal;
+        vm.openEditModal = openEditModal;
         vm.render = render;
+        vm.remove = removeRequest;
 
         init();
 
@@ -22,9 +24,7 @@
             vm.config = {
                 selectable: true,
                 select: select,
-                eventMouseover: onMouseOverEvent,
-                eventMouseout: onMouseOutEvent,
-                eventClick: onClickEvent
+                eventClick: onClickEvent,
             };
 
             getVacationRequests();
@@ -32,18 +32,61 @@
 
         function openAddModal() {
             var modalInstance = $modal.open({
-                templateUrl: 'vacify.addModal.html',
+                templateUrl: '/Home/AddVacationRequest',
                 controller: 'AddModalInstance as vm',
                 size: 'sm'
             });
 
             modalInstance.result.then(function (request) {
                 vm.requests.push(request);
+
+                if (uiCalendarConfig.calendars['vacationRequest']) {
+                    uiCalendarConfig.calendars['vacationRequest'].fullCalendar('refetchEvents');
+                }
             });
         }
 
+        function openEditModal(oldRequest) {
+            var modalInstance = $modal.open({
+                templateUrl: '/Home/EditVacationRequest',
+                controller: 'EditModalInstance as vm',
+                size: 'sm',
+                resolve: {
+                    request: function () {
+                        return oldRequest;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (newRequest) {
+                var index = vm.requests.indexOf(oldRequest);
+                if (index > -1) {
+                    vm.requests[index] = newRequest;
+
+                    if (uiCalendarConfig.calendars['vacationRequest']) {
+                        uiCalendarConfig.calendars['vacationRequest'].fullCalendar('refetchEvents');
+                    }
+                }
+            });
+        }
+
+        function removeRequest(request) {
+            if (request.isSavedRequest) {
+                vm.removedRequests.push(request);
+            }
+
+            var index = vm.requests.indexOf(request);
+            if (index > -1) {
+                vm.requests.splice(index, 1);
+            }
+
+            if (uiCalendarConfig.calendars['vacationRequest']) {
+                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('refetchEvents');
+            }
+        }
+
         function getVacationRequests() {
-            dataService.getVacationRequests()
+            vacationRequest.get()
                 .then(requestComplete, requestFailed);
 
             function requestComplete(response) {
@@ -52,8 +95,8 @@
                         vm.requests.push({
                             id: response.data[i].ID,
                             title: response.data[i].Title,
-                            start: response.data[i].StartDate,
-                            end: response.data[i].EndDate,
+                            start: moment(response.data[i].StartDate),
+                            end: moment(response.data[i].EndDate),
                             status: response.data[i].Status,
                             allDay: true,
                             color: statusToColor("Pending"),
@@ -83,7 +126,7 @@
                 }
             }
 
-            dataService.requestVacation(vacationRequests)
+            vacationRequest.save(vacationRequests)
                 .then(requestComplete, requestFailed);
 
             function requestComplete(data) {
@@ -113,27 +156,8 @@
             }
         }
 
-        function onMouseOverEvent(request, jsEvent, view) {
-            request.color = statusToHoverColor(request.status);
-            if (uiCalendarConfig.calendars['vacationRequest']) {
-                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('updateEvent', request);
-            }
-        }
-
-        function onMouseOutEvent(request, jsEvent, view) {
-            request.color = statusToColor(request.status);
-            if (uiCalendarConfig.calendars['vacationRequest']) {
-                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('updateEvent', request);
-            }
-        }
-
         function onClickEvent(request, jsEvent, view) {
-            if (request.isSavedRequest) {
-                vm.removedRequest.push(request);
-            }
-            if (uiCalendarConfig.calendars['vacationRequest']) {
-                uiCalendarConfig.calendars['vacationRequest'].fullCalendar('removeEvents', request._id);
-            }
+            removeRequest(request);
         }
 
         function successAlert(message) {
@@ -183,4 +207,4 @@
         
     }
 
-})(window.angular);
+})(window.angular, window.moment);

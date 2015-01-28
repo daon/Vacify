@@ -3,11 +3,11 @@
 
     angular
         .module('vacify')
-        .controller('AddModalInstance', AddModalInstance);
+        .controller('EditModalInstance', EditModalInstance);
 
-    AddModalInstance.$inject = ['$scope','$modalInstance']
+    EditModalInstance.$inject = ['$scope', '$modalInstance', 'request']
 
-    function AddModalInstance($scope, $modalInstance) {
+    function EditModalInstance($scope, $modalInstance, request) {
         var vm = this;
         vm.format = 'yyyy-MM-dd';
         vm.openStartDate = openStartDate;
@@ -25,8 +25,9 @@
 
         function init() {
             vm.today = new Date().getTime();
-            vm.startDate = vm.today;
-            vm.minDate = vm.today;
+            vm.startDate = request.start.valueOf();
+            vm.endDate = moment.isMoment(request.end) ? request.end.valueOf() : null;
+            vm.minDate = request.start.valueOf();
         }
 
         function openStartDate($event) {
@@ -44,13 +45,8 @@
         }
 
         function ok() {
-            var request = {
-                title: "New Request",
-                start: moment(vm.startDate),
-                end: moment.isDate(vm.endDate) ? moment(vm.endDate) : null,
-                status: "New",
-                allDay: true
-            }
+            request.start = moment(vm.startDate);
+            request.end = moment.isDate(vm.endDate) ? moment(vm.endDate) : null;
             $modalInstance.close(request);
         }
 

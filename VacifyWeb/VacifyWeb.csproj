@@ -167,8 +167,10 @@
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\app.js" />
     <Content Include="Scripts\app\vacify.add.modal.js" />
-    <Content Include="Scripts\app\vacify.calendar.controller.js" />
-    <Content Include="Scripts\app\vacify.data.service.js" />
+    <Content Include="Scripts\app\vacify.config.js" />
+    <Content Include="Scripts\app\vacify.edit.modal.js" />
+    <Content Include="Scripts\app\vacify.vacationRequests.controller.js" />
+    <Content Include="Scripts\app\vacify.vacationRequest.service.js" />
     <Content Include="Scripts\app\vacify.module.js" />
     <Content Include="Scripts\app\vacify.moment.filter.js" />
     <Content Include="Scripts\app\vacify.navigation.controller.js" />
@@ -204,6 +206,8 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Home\AddVacationRequest.cshtml" />
+    <Content Include="Views\Home\EditVacationRequest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

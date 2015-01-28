@@ -46,6 +46,16 @@ namespace VacifyWeb.Controllers
             return View(viewModel);
         }
 
+        public ActionResult AddVacationRequest()
+        {
+            return View();
+        }
+
+        public ActionResult EditVacationRequest()
+        {
+            return View();
+        }
+
         [HttpGet]
         public JsonResult GetVacationRequests()
         {
@@ -96,7 +106,7 @@ namespace VacifyWeb.Controllers
                         .Select(vacationRequest => new VacationRequest()
                         {
                             ID = ((int)vacationRequest["ID"]),
-                            Title = vacationRequest["Title"].ToString(),
+                            Title = vacationRequest["Status"].ToString() + " Request",
                             StartDate = ((DateTime)vacationRequest["StartDate"]),
                             EndDate = (DateTime)vacationRequest["_EndDate"],
                             RequestBy = vacationRequest["RequestBy"].ToString(),
@@ -109,7 +119,7 @@ namespace VacifyWeb.Controllers
         }
 
         [HttpPost]
-        public JsonResult RequestVacation(List<VacationRequest> vacationRequests)
+        public JsonResult SaveVacationRequests(List<VacationRequest> vacationRequests)
         {
             if (vacationRequests != null)
             {
@@ -129,12 +139,11 @@ namespace VacifyWeb.Controllers
                         foreach (VacationRequest vacationRequest in vacationRequests)
                         {
                             ListItem listItem = vacationRequestList.AddItem(new ListItemCreationInformation());
-                            listItem["Title"] = "New Vacation Request";
                             listItem["StartDate"] = vacationRequest.StartDate;
                             listItem["_EndDate"] = vacationRequest.EndDate;
                             listItem["RequestBy"] = userProperties.DisplayName;
                             listItem["Approver"] = managerProperties != null ? managerProperties.DisplayName : "Lika A Boss!";
-                            listItem["Status"] = vacationRequest.Status;
+                            listItem["Status"] = "Pending";
                             listItem.Update();
                         }
 

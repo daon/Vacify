@@ -7,9 +7,9 @@
 <div class="page-header">
     <h1><span class="glyphicon glyphicon-calendar"></span> Vacify <small>Request Vacation</small></h1>
 </div>
-<div class="row" ng-controller="Calendar as calendar" ng-cloak>
-    <div class="alert alert-success" role="alert" ng-show="calendar.successVisible" ng-animate="{show: 'fade-show', hide: 'fade-hide'}">{{ calendar.successMessage }}</div>
-    <div class="alert alert-danger" role="alert" ng-show="calendar.errorVisible">{{ calendar.errorMessage }}</div>
+<div class="row" ng-controller="VacationRequests as vm" ng-cloak>
+    <div class="alert alert-success" role="alert" ng-show="vm.successVisible" ng-animate="{show: 'fade-show', hide: 'fade-hide'}">{{ vm.successMessage }}</div>
+    <div class="alert alert-danger" role="alert" ng-show="vm.errorVisible">{{ calendar.errorMessage }}</div>
     <div class="col-md-3 col-sm-6 col-xs-12">
         <div class="thumbnail">
             <img src="@Model.PictureUrl" alt="@Model.Name" class="img-responsive" />
@@ -17,8 +17,8 @@
                 <h3>@Model.Name</h3>
                 <p>Manager: @Model.Manager</p>
                 <div class="btn-group">
-                    <button type="button" class="btn btn-default" ng-click="calendar.openAddModal()">Add</button>
-                    <button type="button" class="btn btn-default" ng-click="calendar.saveChanges()">Save</button>
+                    <button type="button" class="btn btn-default" ng-click="vm.openAddModal()">Add</button>
+                    <button type="button" class="btn btn-default" ng-click="vm.saveChanges()">Save</button>
                 </div>
             </div>
         </div>
@@ -36,14 +36,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="request in calendar.requests">
+                        <tr ng-repeat="request in vm.requests">
                             <td>{{ request.start | moment:'YYYY-MM-DD'}}</td>
                             <td>{{ request.end | moment:'YYYY-MM-DD' }}</td>
                             <td>{{ request.status }}</td>
                             <td>
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-default">Edit</button>
-                                    <button type="button" class="btn btn-default">Remove</button>
+                                    <button type="button" class="btn btn-default" ng-click="vm.openEditModal(request)">Edit</button>
+                                    <button type="button" class="btn btn-default" ng-click="vm.remove(request)">Remove</button>
                                 </div>
                             </td>
                         </tr>
@@ -51,8 +51,8 @@
                 </table>
             </div>
 
-            <div tab heading="Calendar View" select="calendar.render()">
-                <div ui-calendar="calendar.config" ng-model="calendar.eventSources" calendar="vacationRequest"></div>
+            <div tab heading="Calendar View" select="vm.render()">
+                <div ui-calendar="vm.config" ng-model="vm.eventSources" calendar="vacationRequest"></div>
             </div>
         </div>
     </div>

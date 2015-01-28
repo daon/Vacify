@@ -6,7 +6,6 @@
             'ngAnimate',
             'ui.calendar',
             'ui.bootstrap',
-            'template/vacify.add-modal.html'
         ]);
 
 })(window.angular);

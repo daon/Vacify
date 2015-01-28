@@ -23,11 +23,13 @@ namespace VacifyWeb
 
             bundles.Add(new ScriptBundle("~/bundles/app").Include(
                         "~/Scripts/app/vacify.module.js",
-                        "~/Scripts/app/vacify.data.service.js",
-                        "~/Scripts/app/vacify.calendar.controller.js",
+                        "~/Scripts/app/vacify.config.js",
+                        "~/Scripts/app/vacify.vacationRequest.service.js",
+                        "~/Scripts/app/vacify.vacationRequests.controller.js",
                         "~/Scripts/app/vacify.navigation.controller.js",
                         "~/Scripts/app/vacify.moment.filter.js",
-                        "~/Scripts/app/vacify.add.modal.js"));
+                        "~/Scripts/app/vacify.add.modal.js",
+                        "~/Scripts/app/vacify.edit.modal.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
