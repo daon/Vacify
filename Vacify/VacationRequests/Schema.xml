@@ -4,12 +4,12 @@
     <ContentTypes>
       
       
-    <ContentType ID="0x01007954ada3036046aba5abc3e72ea35322" Name="ListFieldsContentType"><FieldRefs><FieldRef ID="{64cd368d-2f95-4bfc-a1f9-8d4324ecb007}" Name="StartDate" /><FieldRef ID="{8A121252-85A9-443d-8217-A1B57020FADF}" Name="_EndDate" /><FieldRef ID="{09165755-d715-4ab5-9ed1-dd83e7cb3216}" Name="RequestBy" /><FieldRef ID="{dcfb26aa-d49e-4b68-b63e-640cbcfcad25}" Name="Approver" /><FieldRef ID="{11be8596-1aa1-43b3-8989-ef6e2a3ed0b1}" Name="Status" /></FieldRefs></ContentType><ContentTypeRef ID="0x01">
+    <ContentType ID="0x010011aefb48016f4b188294ff180f1b3a60" Name="ListFieldsContentType"><FieldRefs><FieldRef ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Name="Title" /><FieldRef ID="{64cd368d-2f95-4bfc-a1f9-8d4324ecb007}" Name="StartDate" /><FieldRef ID="{8A121252-85A9-443d-8217-A1B57020FADF}" Name="_EndDate" /><FieldRef ID="{f584b282-1611-43a5-b5c3-e359b5122be9}" Name="RequestBy" /><FieldRef ID="{ea2aa48b-ccfa-4929-8088-ad6b32302adf}" Name="Approver" /><FieldRef ID="{1DAB9B48-2D1A-47b3-878C-8E84F0D211BA}" Name="_Status" /></FieldRefs></ContentType><ContentTypeRef ID="0x01">
         <Folder TargetName="Item" />
       </ContentTypeRef><ContentTypeRef ID="0x0120" /></ContentTypes>
     <Fields>
       
-    <Field ID="{64cd368d-2f95-4bfc-a1f9-8d4324ecb007}" Name="StartDate" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="StartDate" Group="$Resources:core,Base_Columns;" Type="DateTime" Format="DateOnly" DisplayName="$Resources:core,Start_Date;" Required="TRUE"><Default>[today]</Default></Field><Field ID="{8A121252-85A9-443d-8217-A1B57020FADF}" Name="_EndDate" Group="$Resources:core,Base_Columns;" Type="DateTime" DisplayName="$Resources:core,End_Date;" Format="DateTime" SourceID="http://schemas.microsoft.com/sharepoint/v3/fields" StaticName="_EndDate"><Default>[today]</Default></Field><Field Name="RequestBy" ID="{09165755-d715-4ab5-9ed1-dd83e7cb3216}" DisplayName="RequestBy" Type="Text" Required="TRUE" /><Field Name="Approver" ID="{dcfb26aa-d49e-4b68-b63e-640cbcfcad25}" DisplayName="Approver" Type="Text" Required="TRUE" /><Field Name="Status" ID="{11be8596-1aa1-43b3-8989-ef6e2a3ed0b1}" DisplayName="Status" Type="Choice" Required="TRUE" Format="Dropdown" BaseType="Text" FillInChoice="FALSE"><CHOICES><CHOICE>Pending</CHOICE><CHOICE>Approved</CHOICE><CHOICE>Rejected</CHOICE></CHOICES></Field></Fields>
+    <Field ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Type="Text" Name="Title" DisplayName="$Resources:core,Title;" Required="FALSE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="Title" MaxLength="255" /><Field ID="{64cd368d-2f95-4bfc-a1f9-8d4324ecb007}" Name="StartDate" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="StartDate" Group="$Resources:core,Base_Columns;" Type="DateTime" Format="DateOnly" DisplayName="$Resources:core,Start_Date;" Required="TRUE"><Default>[today]</Default></Field><Field ID="{8A121252-85A9-443d-8217-A1B57020FADF}" Name="_EndDate" Group="$Resources:core,Base_Columns;" Type="DateTime" DisplayName="$Resources:core,End_Date;" Format="DateOnly" SourceID="http://schemas.microsoft.com/sharepoint/v3/fields" StaticName="_EndDate"><Default>[today]</Default></Field><Field Name="RequestBy" ID="{f584b282-1611-43a5-b5c3-e359b5122be9}" DisplayName="Request By" Type="Text" Required="TRUE" /><Field Name="Approver" ID="{ea2aa48b-ccfa-4929-8088-ad6b32302adf}" DisplayName="Approver" Type="Text" Required="TRUE" /><Field ID="{1DAB9B48-2D1A-47b3-878C-8E84F0D211BA}" Name="_Status" Group="$Resources:core,Document_Columns;" Type="Choice" DisplayName="$Resources:core,Status;" SourceID="http://schemas.microsoft.com/sharepoint/v3/fields" StaticName="_Status" FillInChoice="FALSE" Required="TRUE"><CHOICES><CHOICE>Pending</CHOICE><CHOICE>Approved</CHOICE><CHOICE>Rejected</CHOICE></CHOICES><Default>$Resources:core,_Status_NotStarted;</Default></Field></Fields>
     <Views>
       
       
@@ -37,7 +37,7 @@
         <RowLimit Paged="TRUE">30</RowLimit>
         <ViewFields>
           
-        <FieldRef Name="LinkTitle"></FieldRef><FieldRef Name="StartDate" /><FieldRef Name="_EndDate" /><FieldRef Name="RequestBy" /><FieldRef Name="Approver" /><FieldRef Name="Status" /></ViewFields>
+        <FieldRef Name="LinkTitle"></FieldRef><FieldRef Name="StartDate" /><FieldRef Name="_EndDate" /><FieldRef Name="RequestBy" /><FieldRef Name="Approver" /><FieldRef Name="_Status" /></ViewFields>
         <Query>
           <OrderBy>
             

@@ -5,6 +5,6 @@
     <ProjectItemFile Source="Schema.xml" Target="VacationRequests\" Type="ElementFile" />
   </Files>
   <ExtensionData>
-    <ExtensionDataItem Key="Microsoft.VisualStudio.SharePoint.ListSettings.ListFieldsContentTypeID" Value="0x01007954ada3036046aba5abc3e72ea35322" />
+    <ExtensionDataItem Key="Microsoft.VisualStudio.SharePoint.ListSettings.ListFieldsContentTypeID" Value="0x010011aefb48016f4b188294ff180f1b3a60" />
   </ExtensionData>
 </ProjectItem>
