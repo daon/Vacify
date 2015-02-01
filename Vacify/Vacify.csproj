@@ -55,6 +55,8 @@
     <Content Include="VacationRequests\Elements.xml" />
     <Content Include="VacationRequests\Schema.xml" />
     <Content Include="VacationRequests\VacationRequestsInstance\Elements.xml" />
+    <Content Include="WorkflowHistoryList\Elements.xml" />
+    <Content Include="WorkflowTaskList\Elements.xml" />
   </ItemGroup>
   <ItemGroup>
     <AppManifestFile Include="AppManifest.xml">
@@ -80,12 +82,41 @@
     <None Include="Package\Package.package">
       <PackageId>{7cc5542d-4262-4a04-8b34-f5a1b241c8b0}</PackageId>
     </None>
+    <None Include="VacationRequestApprovalWorkflow\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{c1a7305e-95c0-4ec4-9382-6c7d3ddbf905}</SharePointProjectItemId>
+    </None>
     <None Include="VacationRequests\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{399ed1f1-3a2f-451d-bf77-79c693032186}</SharePointProjectItemId>
+      <SharePointProjectItemId>{e9d50bae-52d8-4fa5-ae07-b7d365bd5454}</SharePointProjectItemId>
     </None>
     <None Include="VacationRequests\VacationRequestsInstance\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{18cf4784-d4b0-40fe-ba07-ac5505ccdd10}</SharePointProjectItemId>
+      <SharePointProjectItemId>{aeedd316-c6fe-4246-9d0e-2a3dc25c9af6}</SharePointProjectItemId>
     </None>
+    <None Include="WorkflowHistoryList\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{438a8577-d259-4d7c-b5ba-c0e6d7cc8576}</SharePointProjectItemId>
+    </None>
+    <None Include="WorkflowTaskList\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{19d7fe07-0b8e-45fb-880c-dbdc3458bda9}</SharePointProjectItemId>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <XamlAppDef Include="VacationRequestApprovalWorkflow\Workflow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </XamlAppDef>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Activities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.DesignTime.Activities.16.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.DesignTime.Activities.16.0.Design, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel.Activities" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

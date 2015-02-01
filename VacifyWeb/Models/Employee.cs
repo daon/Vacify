@@ -1,15 +1,13 @@
-﻿using VacifyWeb.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace VacifyWeb.ViewModels
+namespace VacifyWeb.Models
 {
-    public class VacationRequestViewModel
+    public class Employee
     {
         public string Name { get; set; }
         public string PictureUrl { get; set; }
         public string Manager { get; set; }
+        public List<string> Employees { get; set; }
     }
 }

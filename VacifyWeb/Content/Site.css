@@ -1,24 +1,27 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
+﻿.navbar {
+    border: none;
+}
+.navbar-inverse {
+    background: #0072c6;
 }
 
-/* Set padding to keep content from hitting the edges */
+    .navbar-inverse .navbar-brand,
+    .navbar-inverse .navbar-nav > li > a {
+        color: #fff;
+    }
+
+        .navbar-inverse .navbar-brand:hover, .navbar-inverse .navbar-brand:focus {
+            background: #005A9E;
+        }
+
+.tab-content > .tab-pane {
+    padding-top: 20px;
+}
+
 .body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 60px 0;
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
-}
-
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
+.vacify-calendar {
+    margin-bottom: 20px;
 }

@@ -14,7 +14,7 @@
   <AppPrincipal>
     <RemoteWebApplication ClientId="*" />
   </AppPrincipal>
-  <AppPermissionRequests AllowAppOnlyPolicy="true" >
+  <AppPermissionRequests AllowAppOnlyPolicy="false" >
     <AppPermissionRequest Scope="http://sharepoint/social/tenant" Right="Read" />
   </AppPermissionRequests>
 </App>

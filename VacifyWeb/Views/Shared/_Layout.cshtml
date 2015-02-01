@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html ng-app="vacify">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,10 +8,10 @@
     @Styles.Render("~/Content/css")
 </head>
 <body>
-    <div ng-controller="Navigation as navigation" class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a href="{{ navigation.spHostUrl }}" class="navbar-brand">Back to site</a>
+                <a href="@ViewBag.SPHostUrl" class="navbar-brand">Back to site</a>
             </div>
         </div>
     </div>
@@ -19,8 +19,6 @@
         @RenderBody()
     </div>
 
-    @Scripts.Render("~/bundles/libs")
-    @Scripts.Render("~/bundles/app")
-    @RenderSection("scripts", required: false)
+    @Scripts.Render("~/bundles/scripts")
 </body>
 </html>

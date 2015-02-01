@@ -1,182 +1,267 @@
-﻿using Microsoft.SharePoint.Client;
+﻿using VacifyWeb.Models;
+using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.UserProfiles;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.Script.Serialization;
-using VacifyWeb.Models;
-using VacifyWeb.ViewModels;
+using System.Linq;
 
 namespace VacifyWeb.Controllers
 {
-    public class HomeController : BaseController
+    public class HomeController : Controller
     {
         [SharePointContextFilter]
         public ActionResult Index()
         {
-            VacationRequestViewModel viewModel = null;
             var spContext = SharePointContextProvider.Current.GetSharePointContext(HttpContext);
             ViewBag.SPHostUrl = spContext.SPHostUrl;
+            Employee employee = GetEmployee(spContext);
 
-            using (var clientContext = spContext.CreateUserClientContextForSPHost())
+            return View(employee);
+        }
+
+        [SharePointContextFilter]
+        [HttpGet]
+        public JsonResult GetMyVacationRequests()
+        {
+            List<VacationRequest> vacationRequests = null;
+            var spContext = SharePointContextProvider.Current.GetSharePointContext(HttpContext);
+            Employee employee = GetEmployee(spContext);
+
+            using (var clientContext = spContext.CreateUserClientContextForSPAppWeb())
             {
-                if (clientContext != null)
-                {
-                    PersonProperties userProperties = LoadUserProperties(clientContext);
-                    clientContext.ExecuteQuery();
+                List vacationRequestList = clientContext.Web.Lists.GetByTitle("Vacation Requests");
+                CamlQuery query = new CamlQuery();
+                query.ViewXml = String.Format(
+                    "<View>" +
+                        "<Query>" +
+                            "<Where>" +
+                                "<Eq>" +
+                                    "<FieldRef Name=\"RequestBy\" />" +
+                                    "<Value Type=\"Text\">{0}</Value>" +
+                                "</Eq>" +
+                            "</Where>" +
+                        "</Query>" +
+                        "<ViewFields>" +
 
-                    PersonProperties managerProperties = LoadManagerProperties(clientContext, userProperties);
-                    if (managerProperties != null) clientContext.ExecuteQuery();
+                            "<FieldRef Name=\"StartDate\" />" +
+                            "<FieldRef Name=\"_EndDate\" />" +
+                            "<FieldRef Name=\"RequestBy\" />" +
+                            "<FieldRef Name=\"Approver\" />" +
+                            "<FieldRef Name=\"_Status\" />" +
+                        "</ViewFields>" +
+                        "<RowLimit>100</RowLimit>" +
+                    "</View>",
+                employee.Name);
 
-                    viewModel = new VacationRequestViewModel()
-                    {
-                        Name = userProperties.DisplayName,
-                        PictureUrl = String.Format("{0}_layouts/15/userphoto.aspx?size={1}&accountname={2}", 
-                                        spContext.SPHostUrl, "L", userProperties.Email),
-                        Manager = managerProperties != null ? managerProperties.DisplayName : "Lika A Boss!"
-                    };
-                }
+                ListItemCollection vacationRequestItems = vacationRequestList.GetItems(query);
+                clientContext.Load(vacationRequestItems);
+                clientContext.ExecuteQuery();
+
+                vacationRequests = vacationRequestItems
+                        .Select(vacationRequest => new VacationRequest()
+                        {
+                            ID = ((int)vacationRequest["ID"]),
+                            StartDate = ((DateTime)vacationRequest["StartDate"]),
+                            EndDate = (DateTime)vacationRequest["_EndDate"],
+                            RequestBy = vacationRequest["RequestBy"].ToString(),
+                            Approver = vacationRequest["Approver"].ToString(),
+                            Status = vacationRequest["_Status"].ToString()
+                        }).ToList();
             }
 
-            return View(viewModel);
+            return Json(vacationRequests, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult AddVacationRequest()
-        {
-            return View();
-        }
-
-        public ActionResult EditVacationRequest()
-        {
-            return View();
-        }
-
+        [SharePointContextFilter]
         [HttpGet]
-        public JsonResult GetVacationRequests()
+        public JsonResult GetMyEmployeesVacationRequests()
         {
-            List<VacationRequest> vacationRequests = new List<VacationRequest>();
+            List<VacationRequest> vacationRequests = null;
+
             var spContext = SharePointContextProvider.Current.GetSharePointContext(HttpContext);
+            Employee employee = GetEmployee(spContext);
+
             using (var clientContext = spContext.CreateUserClientContextForSPAppWeb())
             {
                 if (clientContext != null)
                 {
-                    User spUser = clientContext.Web.CurrentUser;
-                    clientContext.Load(spUser, user => user.Title);
-                    clientContext.ExecuteQuery();
-
                     List vacationRequestList = clientContext.Web.Lists.GetByTitle("Vacation Requests");
                     CamlQuery query = new CamlQuery();
                     query.ViewXml = String.Format(
                         "<View>" +
                             "<Query>" +
                                 "<Where>" +
-                                    "<Or>" +
-                                        "<Eq>" +
-                                            "<FieldRef Name=\"RequestBy\" />" +
-                                            "<Value Type=\"Text\">{0}</Value>" +
-                                        "</Eq>" +
-                                        "<Eq>" +
-                                            "<FieldRef Name=\"Approver\" />" +
-                                            "<Value Type=\"Text\">{0}</Value>" +
-                                        "</Eq>" +
-                                    "</Or>" +
+                                    "<Eq>" +
+                                        "<FieldRef Name=\"Approver\" />" +
+                                        "<Value Type=\"Text\">{0}</Value>" +
+                                    "</Eq>" +
                                 "</Where>" +
                             "</Query>" +
                             "<ViewFields>" +
+
                                 "<FieldRef Name=\"StartDate\" />" +
                                 "<FieldRef Name=\"_EndDate\" />" +
                                 "<FieldRef Name=\"RequestBy\" />" +
                                 "<FieldRef Name=\"Approver\" />" +
-                                "<FieldRef Name=\"Status\" />" +
+                                "<FieldRef Name=\"_Status\" />" +
                             "</ViewFields>" +
                             "<RowLimit>100</RowLimit>" +
                         "</View>",
-                    spUser.Title);
+                    employee.Name);
 
                     ListItemCollection vacationRequestItems = vacationRequestList.GetItems(query);
                     clientContext.Load(vacationRequestItems);
                     clientContext.ExecuteQuery();
 
                     vacationRequests = vacationRequestItems
-                        .Select(vacationRequest => new VacationRequest()
-                        {
-                            ID = ((int)vacationRequest["ID"]),
-                            Title = vacationRequest["Status"].ToString() + " Request",
-                            StartDate = ((DateTime)vacationRequest["StartDate"]),
-                            EndDate = (DateTime)vacationRequest["_EndDate"],
-                            RequestBy = vacationRequest["RequestBy"].ToString(),
-                            Approver = vacationRequest["Approver"].ToString(),
-                            Status = vacationRequest["Status"].ToString()
-                        }).ToList();
+                            .Select(vacationRequest => new VacationRequest()
+                            {
+                                ID = ((int)vacationRequest["ID"]),
+                                StartDate = ((DateTime)vacationRequest["StartDate"]),
+                                EndDate = (DateTime)vacationRequest["_EndDate"],
+                                RequestBy = vacationRequest["RequestBy"].ToString(),
+                                Approver = vacationRequest["Approver"].ToString(),
+                                Status = vacationRequest["_Status"].ToString()
+                            }).ToList();
                 }
             }
+
             return Json(vacationRequests, JsonRequestBehavior.AllowGet);
         }
 
+        [SharePointContextFilter]
         [HttpPost]
         public JsonResult SaveVacationRequests(List<VacationRequest> vacationRequests)
         {
             if (vacationRequests != null)
             {
                 var spContext = SharePointContextProvider.Current.GetSharePointContext(HttpContext);
+                Employee employee = GetEmployee(spContext);
+
                 using (var clientContext = spContext.CreateUserClientContextForSPAppWeb())
                 {
                     if (clientContext != null)
                     {
-                        PersonProperties userProperties = LoadUserProperties(clientContext);
-                        clientContext.ExecuteQuery();
-
-                        PersonProperties managerProperties = LoadManagerProperties(clientContext, userProperties);
-                        if (managerProperties != null) clientContext.ExecuteQuery();
-
                         List vacationRequestList = clientContext.Web.Lists.GetByTitle("Vacation Requests");
-
                         foreach (VacationRequest vacationRequest in vacationRequests)
                         {
-                            ListItem listItem = vacationRequestList.AddItem(new ListItemCreationInformation());
-                            listItem["StartDate"] = vacationRequest.StartDate;
-                            listItem["_EndDate"] = vacationRequest.EndDate;
-                            listItem["RequestBy"] = userProperties.DisplayName;
-                            listItem["Approver"] = managerProperties != null ? managerProperties.DisplayName : "Lika A Boss!";
-                            listItem["Status"] = "Pending";
-                            listItem.Update();
+                            if (vacationRequest.ID == 0)
+                            {
+                                vacationRequest.RequestBy = employee.Name;
+                                vacationRequest.Approver = employee.Manager;
+                                ListItem listItem = vacationRequestList.AddItem(new ListItemCreationInformation());
+                                listItem["StartDate"] = vacationRequest.StartDate;
+                                listItem["_EndDate"] = vacationRequest.EndDate;
+                                listItem["RequestBy"] = vacationRequest.RequestBy;
+                                listItem["Approver"] = vacationRequest.Approver;
+                                listItem["_Status"] = "Pending";
+                                listItem.Update();
+                            }
                         }
 
                         clientContext.ExecuteQuery();
                     }
                 }
             }
+
+            return Json(vacationRequests, JsonRequestBehavior.AllowGet);
+        }
+
+        [SharePointContextFilter]
+        [HttpPost]
+        public JsonResult ApproveVacationRequest(VacationRequest vacationRequest)
+        {
+            var spContext = SharePointContextProvider.Current.GetSharePointContext(HttpContext);
+            setStatus(spContext, vacationRequest, "Approved");
             return new JsonResult();
         }
 
-        private PersonProperties LoadUserProperties(ClientContext clientContext)
+        [SharePointContextFilter]
+        [HttpPost]
+        public JsonResult RejectVacationRequest(VacationRequest vacationRequest)
         {
-            PeopleManager peopleManager = new PeopleManager(clientContext);
-            PersonProperties personProperties = peopleManager.GetMyProperties();
-            clientContext.Load(personProperties, p => p.DisplayName);
-            clientContext.Load(personProperties, p => p.Email);
-            clientContext.Load(personProperties, p => p.UserProfileProperties);
-
-            return personProperties;
+            var spContext = SharePointContextProvider.Current.GetSharePointContext(HttpContext);
+            setStatus(spContext, vacationRequest, "Rejected");
+            return new JsonResult();
         }
 
-        private PersonProperties LoadManagerProperties(ClientContext clientContext, PersonProperties userProperties)
+        private void setStatus(SharePointContext spContext, VacationRequest vacationRequest, string status)
         {
-            PeopleManager peopleManager = new PeopleManager(clientContext);
-            PersonProperties managerProperties = null;
-            string managerAccountName = userProperties.UserProfileProperties["Manager"];
-            if (!string.IsNullOrEmpty(managerAccountName))
+            using (var clientContext = spContext.CreateUserClientContextForSPAppWeb())
             {
-                managerProperties = peopleManager.GetPropertiesFor(managerAccountName);
-                clientContext.Load(managerProperties, p => p.DisplayName);
+
+                if (clientContext != null)
+                {
+                    List vacationRequestList = clientContext.Web.Lists.GetByTitle("Vacation Requests");
+                    ListItem listItem = vacationRequestList.GetItemById(vacationRequest.ID);
+                    listItem["_Status"] = status;
+                    listItem.Update();
+                    clientContext.ExecuteQuery();
+                }
+            }
+        }
+
+        private Employee GetEmployee(SharePointContext spContext)
+        {
+            Employee employee = null;
+
+            using (var clientContext = spContext.CreateUserClientContextForSPHost())
+            {
+                if (clientContext != null)
+                {
+                    PeopleManager peopleManager = new PeopleManager(clientContext);
+
+
+                    // Get current logged in user profile properties
+                    PersonProperties employeeProperties = peopleManager.GetMyProperties();
+                    clientContext.Load(employeeProperties,
+                        e => e.DisplayName,
+                        e => e.Email,
+                        e => e.DirectReports,
+                        e => e.UserProfileProperties
+                    );
+                    clientContext.ExecuteQuery();
+
+
+                    // Get current logged in users manager name
+                    PersonProperties managerProperties = null;
+                    string managerAccountName = employeeProperties.UserProfileProperties["Manager"];
+                    if (!string.IsNullOrEmpty(managerAccountName))
+                    {
+                        managerProperties = peopleManager.GetPropertiesFor(managerAccountName);
+                        clientContext.Load(managerProperties, m => m.DisplayName);
+                    }
+
+                    // Get current logged in users employee names
+                    List<PersonProperties> employeesProperties = new List<PersonProperties>();
+                    foreach (string accountName in employeeProperties.DirectReports)
+                    {
+                        PersonProperties personProperties = peopleManager.GetPropertiesFor(accountName);
+                        clientContext.Load(personProperties, p => p.DisplayName);
+                        employeesProperties.Add(personProperties);
+                    }
+                    clientContext.ExecuteQuery();
+
+                    List<string> employees = new List<string>();
+                    foreach (PersonProperties personProperties in employeesProperties)
+                    {
+                        employees.Add(personProperties.DisplayName);
+                    }
+
+                    // Construct a new Employee model
+                    employee = new Employee()
+                    {
+                        Name = employeeProperties.DisplayName,
+                        PictureUrl = String.Format("{0}_layouts/15/userphoto.aspx?size={1}&accountname={2}",
+                                        spContext.SPHostUrl, "L", employeeProperties.Email),
+                        Manager = managerProperties != null ? managerProperties.DisplayName : "Lika A Boss!",
+                        Employees = employees
+                    };
+                }
             }
 
-            return managerProperties;
+            return employee;
         }
     }
 }
